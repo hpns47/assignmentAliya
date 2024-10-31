@@ -4,13 +4,14 @@ from bson.objectid import ObjectId
 from passlib.hash import bcrypt
 import fastapi
 
-async def add_user(email: str, password: str) -> dict:
+async def add_user(email: str, password: str,status: bool) -> dict:
     
     hashed_password = bcrypt.hash(password)
     user: dict = {
         "email": email,
         "password": hashed_password,
-        "created_at": datetime.utcnow().isoformat()  
+        "created_at": datetime.utcnow().isoformat(),
+        
     }
     
     try:
@@ -23,6 +24,7 @@ async def add_user(email: str, password: str) -> dict:
     except Exception as e:
         print(f"Ошибка при добавлении пользователя: {e}")
         return {}
+
 
 async def get_user_by_email(email: str) -> dict:
     try:

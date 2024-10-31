@@ -2,94 +2,195 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация и Вход</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <style>
+        /* Стили для страницы */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f2f2;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        input[type="email"], input[type="password"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #007bff;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .toggle-button {
+            font-size: 14px;
+            color: #007bff;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .toggle-button:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h2>Регистрация</h2>
-    <form id="registerForm">
-        <label for="regEmail">Email:</label>
-        <input type="email" id="regEmail" name="email" required>
-        <br>
-        <label for="regPassword">Пароль:</label>
-        <input type="password" id="regPassword" name="password" required>
-        <br>
-        <button type="submit">Зарегистрироваться</button>
-    </form>
+    <div class="container">
+        <h2 id="formTitle">Регистрация</h2>
 
-    <h2>Вход</h2>
-    <form id="loginForm">
-        <label for="loginEmail">Email:</label>
-        <input type="email" id="loginEmail" name="email" required>
-        <br>
-        <label for="loginPassword">Пароль:</label>
-        <input type="password" id="loginPassword" name="password" required>
-        <br>
-        <button type="submit">Войти</button>
-    </form>
+        <!-- Регистрационная форма -->
+        <form id="registerForm">
+            <label for="regEmail">Email:</label>
+            <input type="email" id="regEmail" name="email" required>
+            
+            <label for="regPassword">Пароль:</label>
+            <input type="password" id="regPassword" name="password" required>
+            
+            <button type="submit">Зарегистрироваться</button>
+        </form>
 
-    <h2>Доступ к защищенному контенту</h2>
-    <button onclick="getProtectedContent()">Получить защищенные данные</button>
+        <!-- Форма для входа -->
+        <form id="loginForm" style="display: none;">
+            <label for="loginEmail">Email:</label>
+            <input type="email" id="loginEmail" name="email" required>
+            
+            <label for="loginPassword">Пароль:</label>
+            <input type="password" id="loginPassword" name="password" required>
+            
+            <button type="submit">Войти</button>
+        </form>
+
+        <!-- Кнопка-переключатель между формами -->
+        <div class="toggle-button" onclick="toggleForms()">
+            Уже есть аккаунт? Войти
+        </div>
+    </div>
 
     <script>
-        
-document.getElementById("registerForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("regEmail").value;
-    const password = document.getElementById("regPassword").value;
+        const registerForm = document.getElementById("registerForm");
+        const loginForm = document.getElementById("loginForm");
+        const formTitle = document.getElementById("formTitle");
+        const toggleButton = document.querySelector(".toggle-button");
 
-    const response = await fetch("/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-
-    const data = await response.json();
-    alert(JSON.stringify(data));
-};
-
-
-document.getElementById("loginForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    const response = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-    });
-
-    const data = await response.json();
-    if (data.access_token) {
-        localStorage.setItem("token", data.access_token);
-        alert("Вход выполнен успешно!");
-    } else {
-        alert("Ошибка входа");
-    }
-};
-
-
-async function getProtectedContent() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        alert("Сначала выполните вход");
-        return;
-    }
-
-    const response = await fetch("/protected", {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
+        // Функция для переключения между формами
+        function toggleForms() {
+            if (registerForm.style.display === "none") {
+                registerForm.style.display = "flex";
+                loginForm.style.display = "none";
+                formTitle.textContent = "Регистрация";
+                toggleButton.textContent = "Уже есть аккаунт? Войти";
+            } else {
+                registerForm.style.display = "none";
+                loginForm.style.display = "flex";
+                formTitle.textContent = "Вход";
+                toggleButton.textContent = "Нет аккаунта? Зарегистрироваться";
+            }
         }
-    });
 
-    const data = await response.json();
-    alert(JSON.stringify(data));
-}
+        // Логика регистрации
+        registerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("regEmail").value;
+            const password = document.getElementById("regPassword").value;
 
+            const response = await fetch("/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
 
+            const data = await response.json();
+            alert(JSON.stringify(data));
+        };
 
+        // Логика входа с редиректом
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            const response = await fetch("/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+            if (data.access_token) {
+                localStorage.setItem("token", data.access_token);
+                alert("Вход выполнен успешно!");
+                await getProtectedContent()
+                // window.location.href = "/protected";
+            } else {
+                alert("Ошибка входа");
+            }
+        };
+
+        
+        async function getProtectedContent() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Сначала выполните вход");
+                return;
+            }
+            console.log(token);
+            
+            const response = await fetch("/protected", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            alert(JSON.stringify(data));
+        }
     </script>
 </body>
 </html>

@@ -8,5 +8,14 @@ class User(BaseModel):
     email : str
     password : str
     created_at: datetime
+
+
+class Record(BaseModel):
+    _id: UUID
+    user_id: str
+    master: str
+    created_at: datetime
+    category: str
+    price: float
     
     

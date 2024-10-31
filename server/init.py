@@ -3,9 +3,14 @@ from database.settings import  database, check_connection
 from fastapi.staticfiles import StaticFiles
 
 import yaml
-
+import os
 from fastapi.middleware.cors import CORSMiddleware
+
+
 DB_NAME: str = "assignment"
+
+static_dir = os.path.join(os.path.dirname(__file__), "../app/static")
+
 
 async def create_app() -> FastAPI:
     app = FastAPI(docs_url="/docs")
@@ -24,7 +29,8 @@ async def create_app() -> FastAPI:
         allow_headers=["*"],  
     )
 
-    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 
     try:
         await check_connection()
