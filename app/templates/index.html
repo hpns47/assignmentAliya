@@ -106,7 +106,7 @@
             <button type="submit">Войти</button>
         </form>
 
-        <!-- Кнопка-переключатель между формами -->
+        
         <div class="toggle-button" onclick="toggleForms()">
             Уже есть аккаунт? Войти
         </div>
@@ -118,7 +118,7 @@
         const formTitle = document.getElementById("formTitle");
         const toggleButton = document.querySelector(".toggle-button");
 
-        // Функция для переключения между формами
+        
         function toggleForms() {
             if (registerForm.style.display === "none") {
                 registerForm.style.display = "flex";
@@ -133,7 +133,7 @@
             }
         }
 
-        // Логика регистрации
+        
         registerForm.onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById("regEmail").value;
@@ -163,10 +163,8 @@
 
             const data = await response.json();
             if (data.access_token) {
-                localStorage.setItem("token", data.access_token);
-                alert("Вход выполнен успешно!");
-                await getProtectedContent()
-                // window.location.href = "/protected";
+                document.cookie = `token=${data.access_token}; path=/;`;
+                window.location.href = "/main";
             } else {
                 alert("Ошибка входа");
             }
@@ -189,7 +187,8 @@
             });
 
             const data = await response.json();
-            alert(JSON.stringify(data));
+            window.location.href = "/protected"
+            // alert(JSON.stringify(data));
         }
     </script>
 </body>

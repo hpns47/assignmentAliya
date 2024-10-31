@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minky-Blinky — Главная</title>
+    <style>
+        /* Основные стили для всей страницы */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            width: 100%;
+            background-color: #ff99cc;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            margin: 0;
+            font-family: 'Georgia', serif;
+        }
+
+        .btn-logout {
+            padding: 8px 15px;
+            background-color: white;
+            color: #ff99cc;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: #ffe6f0;
+        }
+
+        .page-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 80px; /* Отступ для фиксированного header */
+        }
+
+        .container {
+            max-width: 800px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ff99cc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .btn-book {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #ff99cc;
+            color: #fff;
+            font-size: 1.2em;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-book:hover {
+            background-color: #ff66b2;
+        }
+
+        /* Галерея */
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 180px;
+        }
+
+        .gallery img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .work-description {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* Футер */
+        footer {
+            background-color: #ff99cc;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .social-links a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header с кнопкой выхода -->
+    <header>
+        <h1>Minky-Blinky</h1>
+        <button class="btn-logout" onclick="logout()">Выйти</button>
+    </header>
+
+    <div class="page-content">
+        <div class="container">
+            <h1>Добро пожаловать в Minky-Blinky!</h1>
+            <p>Мы создаем красоту и уверенность каждый день. Наши мастера заботятся о вашем стиле и комфорте.</p>
+            <p>Запишитесь на услуги маникюра, макияжа и прически в уютной атмосфере нашего салона.</p>
+            
+            <!-- Кнопка записи -->
+            <a href="/book" class="btn-book">Записаться</a>
+
+            <!-- Галерея с описанием каждой работы -->
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="/static/images/work1.jpg" alt="Работа 1">
+                    <p class="work-description">Нежный розовый маникюр с акцентом на безымянный палец. Мастер Анна.</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/work2.jpg" alt="Работа 2">
+                    <p class="work-description">Легкий дневной макияж с натуральными оттенками. Мастер Ольга.</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/work3.jpg" alt="Работа 3">
+                    <p class="work-description">Элегантная прическа для вечернего мероприятия. Мастер Елена.</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/images/work4.jpg" alt="Работа 4">
+                    <p class="work-description">Французский маникюр с тонкими линиями. Мастер Анна.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер с контактами и соцсетями -->
+    <footer>
+        <p>Наш адрес: г. Астана, ул. Мангилик Ел, С1.1</p>
+        <p>Телефон: +7 (777) 777-77-77</p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/minkyblinky" target="_blank">Instagram</a>
+            <a href="https://www.facebook.com/minkyblinky" target="_blank">Facebook</a>
+            <a href="https://www.twitter.com/minkyblinky" target="_blank">Twitter</a>
+        </div>
+    </footer>
+
+    <script>
+        function logout() {
+            // Очистка токена из localStorage
+            localStorage.removeItem("token");
+
+            // Очистка токена из cookies (если используется)
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+            // Перенаправление на страницу входа
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>

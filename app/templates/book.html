@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minky-Blinky — Запись</title>
+    <style>
+        /* Основные стили */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f0;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff99cc;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff99cc;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff99cc;
+            color: #fff;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #ff66b2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Запись на услугу</h1>
+        <p>Выберите мастера и категорию услуги, чтобы записаться в наш салон Minky-Blinky.</p>
+
+        
+        <form id="recordForm">
+            <div class="form-group">
+                <label for="user_id">Ваш ID (для авторизации):</label>
+                <input type="text" id="user_id" name="user_id" value="{{user._id}}" required readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="master">Выберите мастера:</label>
+                <select id="master" name="master" required>
+                    <option value="" disabled selected>Выберите мастера</option>
+                    <option value="Мастер Анна">Мастер Анна</option>
+                    <option value="Мастер Ольга">Мастер Ольга</option>
+                    <option value="Мастер Елена">Мастер Елена</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Категория услуги:</label>
+                <select id="category" name="category" required>
+                    <option value="" disabled selected>Выберите категорию</option>
+                    <option value="Маникюр">Маникюр</option>
+                    <option value="Макияж">Макияж</option>
+                    <option value="Прическа">Прическа</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Цена:</label>
+                <input type="number" id="price" name="price" placeholder="Введите цену" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Записаться</button>
+        </form>
+    </div>
+
+    <script>
+        
+        document.getElementById("recordForm").onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById("user_id").value;
+            const master = document.getElementById("master").value;
+            const category = document.getElementById("category").value;
+            const price = document.getElementById("price").value;
+
+            const recordData = {
+                user_id: userId,
+                master: master,
+                created_at: new Date().toISOString(), 
+                category: category,
+                price: parseFloat(price),
+            };
+
+            const response = await fetch("/api/record", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(recordData),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                
+                window.location.href = "/main"; 
+            } else {
+                alert("Ошибка при записи: " + result.message);
+            }
+        };
+    </script>
+</body>
+</html>

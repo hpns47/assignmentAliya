@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Body, HTTPException, Depends, Request
+from fastapi import APIRouter, Body, HTTPException, Depends, Request,Response
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from passlib.hash import bcrypt
 from typing import Dict
 from app.models.schemas import User
 from app.services.user import add_user, get_user_by_email
+from app.services.record import get_record_by_master,add_record
 from database.settings import doc_orders
 from datetime import datetime, timedelta
 from middleware.user_middleware import get_current_user
@@ -77,8 +78,49 @@ async def login_user(body: Dict[str, str] = Body(...)):
 
 
 @api_router.get("/protected")
-async def read_protected_data(current_user: dict = Depends(get_current_user)):
-    return {"message": "Это защищенный ресурс", "user": current_user}
+async def read_protected_data(request: Request, current_user: dict = Depends(get_current_user)):
+    # Рендер защищенного шаблона с данными пользователя
+    return templates.TemplateResponse("protected.html", {"request": request, "user": current_user})
+
+
+@api_router.post("/logout")
+async def logout(response: Response):
+    
+    response.delete_cookie("token")
+    return {"message": "Вы успешно вышли из системы"}
+
+
+@api_router.get("/book")
+async def book_record(request: Request, current_user: dict = Depends(get_current_user)):
+    return templates.TemplateResponse("book.html", {"request": request, "user": current_user})
+
+
+@api_router.post("/api/record")
+async def api_record(request: Request, data: dict = Body()):
+    print(data)
+    user_id = data.get("user_id")
+    master = data.get("master")
+    created_at = data.get("created_at")
+    category = data.get("category")
+    price = data.get("price")
+    if not all([user_id, master, created_at, category, price]):
+        raise HTTPException(status_code=400, detail="Не все данные предоставлены.")
+
+    # Создание записи с учетом времени
+    try:
+        record = await add_record(user_id=user_id, master=master,
+                                  category=category, price=price)
+        return {"request": str(request), "record": record}
+    except Exception as e:
+        print(f"Ошибка при создании записи: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка сервера при создании записи.")
+
+
+
+@api_router.get("/main")
+async def main_page(request: Request, current_user: dict = Depends(get_current_user)):
+
+    return templates.TemplateResponse("main.html", {"request": request, "user": current_user})
 
 
 
