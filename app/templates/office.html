@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Записи пользователя</title>
+    <style>
+        /* Основные стили */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f0;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff99cc;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+
+        .order-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .order-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-details {
+            color: #555;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ваши записи</h1>
+        <ul class="order-list" id="orderList">
+            <!-- Заказы будут добавлены сюда динамически -->
+        </ul>
+    </div>
+
+    <script>
+        // Получаем ID пользователя (здесь предполагается, что он есть в sessionStorage или в URL)
+        const userId = "{{user._id}}"; 
+
+        
+        async function fetchUserOrders() {
+            try {
+                const response = await fetch(`/api/orders?user_id=${userId}`);
+                if (!response.ok) {
+                    throw new Error("Ошибка при получении заказов");
+                }
+
+                const orders = await response.json();
+
+                const orderList = document.getElementById("orderList");
+                orderList.innerHTML = ""; // Очищаем список перед добавлением
+
+                if (orders.length === 0) {
+                    orderList.innerHTML = "<p>У вас нет заказов.</p>";
+                    return;
+                }
+
+                // Заполняем список заказов
+                orders.forEach(order => {
+                    const orderItem = document.createElement("li");
+                    orderItem.className = "order-item";
+
+                    orderItem.innerHTML = `
+                        <div class="order-details">
+                            <strong>Мастер:</strong> ${order.master}<br>
+                            <strong>Категория:</strong> ${order.category}<br>
+                            <strong>Дата:</strong> ${new Date(order.created_at).toLocaleDateString()}<br>
+                            <strong>Цена:</strong> ${order.price} тг.
+                        </div>
+                    `;
+                    orderList.appendChild(orderItem);
+                });
+            } catch (error) {
+                console.error(error);
+                const orderList = document.getElementById("orderList");
+                orderList.innerHTML = "<p>Произошла ошибка при загрузке заказов.</p>";
+            }
+        }
+
+        // Вызов функции при загрузке страницы
+        fetchUserOrders();
+    </script>
+</body>
+</html>

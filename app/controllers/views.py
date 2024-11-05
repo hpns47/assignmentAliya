@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, HTTPException, Depends, Request,Response
+from fastapi import APIRouter, Body, HTTPException, Depends, Request,Response, File, UploadFile,Form
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from passlib.hash import bcrypt
@@ -96,21 +96,42 @@ async def book_record(request: Request, current_user: dict = Depends(get_current
 
 
 @api_router.post("/api/record")
-async def api_record(request: Request, data: dict = Body()):
-    print(data)
-    user_id = data.get("user_id")
-    master = data.get("master")
-    created_at = data.get("created_at")
-    category = data.get("category")
-    price = data.get("price")
+async def api_record(
+    request: Request,
+    user_id: str = Form(...),
+    master: str = Form(...),
+    created_at: str = Form(...),
+    category: str = Form(...),
+    price: float = Form(...),
+    file: UploadFile = File(...)
+):
+    
+    print({
+        "user_id": user_id,
+        "master": master,
+        "created_at": created_at,
+        "category": category,
+        "price": price,
+        "filename": file.filename
+    })
+
+    
     if not all([user_id, master, created_at, category, price]):
         raise HTTPException(status_code=400, detail="Не все данные предоставлены.")
 
-    # Создание записи с учетом времени
+    
     try:
+        file_content = await file.read()
+        
+        with open(f"app/uploads/{file.filename}", "wb") as f:
+            f.write(file_content)
+        
+        
         record = await add_record(user_id=user_id, master=master,
-                                  category=category, price=price)
-        return {"request": str(request), "record": record}
+                                  category=category, price=price, filename=file.filename)
+        
+        return {"request": str(request), "record": record, "filename": file.filename}
+    
     except Exception as e:
         print(f"Ошибка при создании записи: {e}")
         raise HTTPException(status_code=500, detail="Ошибка сервера при создании записи.")
@@ -121,6 +142,33 @@ async def api_record(request: Request, data: dict = Body()):
 async def main_page(request: Request, current_user: dict = Depends(get_current_user)):
 
     return templates.TemplateResponse("main.html", {"request": request, "user": current_user})
+
+
+@api_router.get("/myoffice")
+async def my_office(request: Request, current_user: dict = Depends(get_current_user)):
+    return templates.TemplateResponse("office.html", {"request": request, "user": current_user})
+    
+
+@api_router.get("/api/orders")
+async def get_user_orders(user_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Получить заказы пользователя по его user_id.
+    """
+    try:
+        orders = await doc_orders.find({"user_id": user_id}).to_list(length=None)
+        
+        
+        if not orders:
+            return {"result": "Нет заказов для этого пользователя"}
+        
+        for order in orders:
+            order["_id"] = str(order["_id"])
+        
+        return orders
+    
+    except Exception as e:
+        print(f"Ошибка при получении заказов: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка сервера при получении заказов.")
 
 
 

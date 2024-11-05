@@ -2,7 +2,7 @@ from database.settings import doc_orders
 from datetime import datetime
 
 
-async def add_record(user_id: str, master: str, category: str, price: float) -> dict:
+async def add_record(user_id: str, master: str, category: str, price: float, filename: str) -> dict:
     
     
     record: dict = {
@@ -10,7 +10,8 @@ async def add_record(user_id: str, master: str, category: str, price: float) -> 
         "master": master,
         "created_at": datetime.utcnow().isoformat(),
         "category": category,
-        "price": price
+        "price": price,
+        "file_name": filename
 
     }
     

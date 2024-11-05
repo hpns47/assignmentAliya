@@ -91,11 +91,10 @@
         <h1>Запись на услугу</h1>
         <p>Выберите мастера и категорию услуги, чтобы записаться в наш салон Minky-Blinky.</p>
 
-        
         <form id="recordForm">
             <div class="form-group">
-                <label for="user_id">Ваш ID (для авторизации):</label>
-                <input type="text" id="user_id" name="user_id" value="{{user._id}}" required readonly>
+                <!-- <label for="user_id">Ваш ID (для авторизации):</label> -->
+                <input type="text" id="user_id" name="user_id" value="{{user._id}}" required readonly hidden>
             </div>
 
             <div class="form-group">
@@ -120,7 +119,13 @@
 
             <div class="form-group">
                 <label for="price">Цена:</label>
-                <input type="number" id="price" name="price" placeholder="Введите цену" required>
+                <input type="number" id="price" name="price" placeholder="Введите цену" required readonly value="10000">
+            </div>
+
+            <!-- Поле для загрузки файла -->
+            <div class="form-group">
+                <label for="file">Прикрепить файл:</label>
+                <input type="file" id="file" name="file" required>
             </div>
 
             <button type="submit" class="btn-submit">Записаться</button>
@@ -128,32 +133,46 @@
     </div>
 
     <script>
-        
+        const categoryPrices = {
+        "Маникюр": 5000,
+        "Макияж": 8000,
+        "Прическа": 10000
+    };
+
+    document.getElementById("category").addEventListener("change", function () {
+        const selectedCategory = this.value;
+        const priceInput = document.getElementById("price");
+
+        priceInput.value = categoryPrices[selectedCategory] || "";
+    });
+
+
         document.getElementById("recordForm").onsubmit = async (e) => {
             e.preventDefault();
             
-            const userId = document.getElementById("user_id").value;
-            const master = document.getElementById("master").value;
-            const category = document.getElementById("category").value;
-            const price = document.getElementById("price").value;
+            const formData = new FormData();
+            formData.append("user_id", document.getElementById("user_id").value);
+            formData.append("master", document.getElementById("master").value);
+            formData.append("category", document.getElementById("category").value);
+            formData.append("price", parseFloat(document.getElementById("price").value));
+            formData.append("created_at", new Date().toISOString());
 
-            const recordData = {
-                user_id: userId,
-                master: master,
-                created_at: new Date().toISOString(), 
-                category: category,
-                price: parseFloat(price),
-            };
+            // Получаем файл из input и добавляем в formData
+            const fileInput = document.getElementById("file");
+            if (fileInput.files.length > 0) {
+                formData.append("file", fileInput.files[0]);
+            } else {
+                alert("Пожалуйста, прикрепите файл.");
+                return;
+            }
 
             const response = await fetch("/api/record", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(recordData),
+                body: formData,
             });
 
             const result = await response.json();
             if (response.ok) {
-                
                 window.location.href = "/main"; 
             } else {
                 alert("Ошибка при записи: " + result.message);
